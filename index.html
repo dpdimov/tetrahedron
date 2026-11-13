@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>One tetrahedron, seven viewpoints</title>
+<style>
+@font-face{font-family:"Newsreader";font-style:normal;font-weight:400 500;font-display:swap;src:url(fonts/newsreader-vietnamese.woff2) format("woff2");unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:"Newsreader";font-style:normal;font-weight:400 500;font-display:swap;src:url(fonts/newsreader-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:"Newsreader";font-style:normal;font-weight:400 500;font-display:swap;src:url(fonts/newsreader-latin.woff2) format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:"Public Sans";font-style:normal;font-weight:400 500;font-display:swap;src:url(fonts/public-sans-vietnamese.woff2) format("woff2");unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:"Public Sans";font-style:normal;font-weight:400 500;font-display:swap;src:url(fonts/public-sans-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:"Public Sans";font-style:normal;font-weight:400 500;font-display:swap;src:url(fonts/public-sans-latin.woff2) format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+:root{--bg:#F5F6F8;--panel:#FFFFFF;--ink:#1C1F26;--muted:#5B6170;--rule:#D9DCE3;--accent:#3E4FA3;--x:#6A5FD0;--y:#178A68;--amb:#B26E12;--gray:#8A8E99;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161B;--panel:#1C1F26;--ink:#E8EAEF;--muted:#A2A8B6;--rule:#2F333D;--accent:#9AA8F0;--x:#9C93F0;--y:#3FC497;--amb:#E3A04A;--gray:#7A7F8C;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14161B;--panel:#1C1F26;--ink:#E8EAEF;--muted:#A2A8B6;--rule:#2F333D;--accent:#9AA8F0;--x:#9C93F0;--y:#3FC497;--amb:#E3A04A;--gray:#7A7F8C;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.6}
+main{max-width:1080px;margin:0 auto;padding:2.5rem 1.25rem 3rem}
+h1{font-family:"Newsreader",Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(1.9rem,4.5vw,2.8rem);line-height:1.1;margin:0 0 .75rem;letter-spacing:-.01em}
+.lede{font-family:"Newsreader",Georgia,serif;font-size:1.15rem;line-height:1.65;color:var(--muted);max-width:62ch;margin:0 0 2rem}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr);gap:1.5rem}
+@media (min-width:860px){.wrap{grid-template-columns:minmax(0,1fr) 300px;align-items:start}}
+.stage{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:.75rem}
+canvas{width:100%;height:min(70vh,520px);min-height:340px;display:block;touch-action:none;cursor:grab}
+canvas:active{cursor:grabbing}
+.hint{font-size:.8rem;color:var(--muted);text-align:center;margin:.25rem 0 0}
+.controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.group{grid-column:1/-1;font-size:.85rem;color:var(--muted);margin:.75rem 0 0}
+.group:first-child{margin-top:0}
+button{font:inherit;font-size:.88rem;line-height:1.3;text-align:left;padding:.6rem .75rem;min-height:44px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.on{border-color:var(--accent);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+#tour{grid-column:1/-1;text-align:center;margin-top:.5rem}
+#info{font-size:.88rem;color:var(--muted);line-height:1.7;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--rule)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;vertical-align:-1px}
+.notes{max-width:62ch;margin-top:2.5rem;font-size:.95rem;color:var(--muted)}
+.notes p{margin:0 0 .9rem}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<main>
+<h1>One tetrahedron, seven viewpoints</h1>
+<p class="lede">Four capacities sit at the vertices and six dynamics run along the edges. Seen from the right angle, any pair of opposite edges looks like the crossed axes of a two-by-two framework. Seen from a vertex, one capacity becomes the lens and the other three recede into a triangle behind it.</p>
+
+<div class="wrap">
+<div class="stage">
+<canvas id="cv" aria-label="Rotatable tetrahedron of four capacities and six dynamics"></canvas>
+<p class="hint">Drag to rotate freely</p>
+</div>
+<div>
+<div class="controls">
+<div class="group">Opposite-edge pairs</div>
+<button class="on" data-v="0">Meaning making × Generative learning</button>
+<button data-v="1">Trust × Aspiration</button>
+<button data-v="2">Integrity × Exploration</button>
+<button data-v="3">Oblique view</button>
+<div class="group">Node in front</div>
+<button data-v="4">Values</button>
+<button data-v="5">Connection</button>
+<button data-v="6">Coherence</button>
+<button data-v="7">Imagination</button>
+<button id="tour">Play tour</button>
+</div>
+<div id="info" aria-live="polite"></div>
+</div>
+</div>
+
+<div class="notes">
+<p>In a pair view, the two coloured edges seem to cross, but they are skew: the amber segment, their common perpendicular, keeps them two units apart in depth. Seen head-on it shrinks to a point. Where edges cross on screen, the one nearer to you is drawn over a gap in the other.</p>
+<p>In a node view, purple spokes are the three dynamics involving the front capacity; the shaded teal face holds the three that do not. Each spoke is the skew partner of the face edge opposite it.</p>
+</div>
+</main>
+<script>
+const P={V:[1,1,1],C:[1,-1,-1],Co:[-1,1,-1],I:[-1,-1,1]};
+const N={V:'Values',C:'Connection',Co:'Coherence',I:'Imagination'};
+const VK=['V','C','Co','I'];
+const E=[['V','C','Meaning making'],['Co','I','Generative learning'],['Co','C','Trust'],['I','V','Aspiration'],['V','Co','Integrity'],['C','I','Exploration']];
+const PAIRS=[[0,1],[2,3],[4,5]];
+const s=Math.SQRT1_2;
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const nrm=a=>{const l=Math.hypot(...a);return a.map(x=>x/l)};
+function look(f){f=nrm(f);const r=nrm(cross([0.15,0.1,1],f));return[r,cross(f,r),f]}
+function vview(v){const f=nrm(P[v]);const t=P[v==='I'?'V':'I'];const d=dot(t,f);const u=nrm(t.map((x,j)=>x-d*f[j]));return[cross(u,f),u,f]}
+const VIEWS=[[[0,s,s],[0,-s,s],[1,0,0]],[[-s,s,0],[-s,-s,0],[0,0,1]],[[-s,0,-s],[-s,0,s],[0,1,0]],look([0.85,0.45,0.55]),...VK.map(vview)];
+function nrm4(q){const l=Math.hypot(...q);return q.map(v=>v/l)}
+function m2q(m){const t=m[0][0]+m[1][1]+m[2][2];let w,x,y,z,S;
+if(t>0){S=Math.sqrt(t+1)*2;w=S/4;x=(m[2][1]-m[1][2])/S;y=(m[0][2]-m[2][0])/S;z=(m[1][0]-m[0][1])/S}
+else if(m[0][0]>m[1][1]&&m[0][0]>m[2][2]){S=Math.sqrt(1+m[0][0]-m[1][1]-m[2][2])*2;w=(m[2][1]-m[1][2])/S;x=S/4;y=(m[0][1]+m[1][0])/S;z=(m[0][2]+m[2][0])/S}
+else if(m[1][1]>m[2][2]){S=Math.sqrt(1+m[1][1]-m[0][0]-m[2][2])*2;w=(m[0][2]-m[2][0])/S;x=(m[0][1]+m[1][0])/S;y=S/4;z=(m[1][2]+m[2][1])/S}
+else{S=Math.sqrt(1+m[2][2]-m[0][0]-m[1][1])*2;w=(m[1][0]-m[0][1])/S;x=(m[0][2]+m[2][0])/S;y=(m[1][2]+m[2][1])/S;z=S/4}
+return nrm4([w,x,y,z])}
+function q2m([w,x,y,z]){return[[1-2*(y*y+z*z),2*(x*y-z*w),2*(x*z+y*w)],[2*(x*y+z*w),1-2*(x*x+z*z),2*(y*z-x*w)],[2*(x*z-y*w),2*(y*z+x*w),1-2*(x*x+y*y)]]}
+function slerp(a,b,t){let d=a[0]*b[0]+a[1]*b[1]+a[2]*b[2]+a[3]*b[3];if(d<0){b=b.map(v=>-v);d=-d}
+if(d>0.9995)return nrm4(a.map((v,i)=>v+(b[i]-v)*t));const th=Math.acos(d),sn=Math.sin(th);
+return a.map((v,i)=>(Math.sin((1-t)*th)*v+Math.sin(t*th)*b[i])/sn)}
+function mm(A,B){return A.map(r=>[0,1,2].map(j=>r[0]*B[0][j]+r[1]*B[1][j]+r[2]*B[2][j]))}
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let M=VIEWS[3].map(r=>r.slice()),pair=0,vtx=0,mode='pair',anim=null,tour=null,cur=-1;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),info=document.getElementById('info');
+const btns=[...document.querySelectorAll('button[data-v]')];
+function go(v){if(v<3){pair=v;mode='pair'}if(v>=4){vtx=v-4;mode='vertex'}cur=v;anim={a:m2q(M),b:m2q(VIEWS[v]),t0:performance.now(),d:reduce?1:1300};
+btns.forEach(b=>b.classList.toggle('on',+b.dataset.v===v))}
+btns.forEach(b=>b.onclick=()=>{stopTour();go(+b.dataset.v)});
+const tb=document.getElementById('tour');const SEQ=[0,1,2,4,5,6,7];
+function stopTour(){if(tour){clearInterval(tour);tour=null;tb.textContent='Play tour';tb.classList.remove('on')}}
+tb.onclick=()=>{if(tour){stopTour();return}let i=SEQ.indexOf(cur);i=(i+1)%SEQ.length;go(SEQ[i]);tour=setInterval(()=>{i=(i+1)%SEQ.length;go(SEQ[i])},3200);tb.textContent='Pause tour';tb.classList.add('on')};
+let drag=null;
+cv.addEventListener('pointerdown',e=>{drag=[e.clientX,e.clientY];anim=null;stopTour();cur=-1;cv.setPointerCapture(e.pointerId);btns.forEach(b=>b.classList.remove('on'))});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const dx=(e.clientX-drag[0])*0.01,dy=(e.clientY-drag[1])*0.01;drag=[e.clientX,e.clientY];
+const c=Math.cos(dx),sn=Math.sin(dx),c2=Math.cos(dy),s2=Math.sin(dy);
+M=mm([[1,0,0],[0,c2,-s2],[0,s2,c2]],mm([[c,0,sn],[0,1,0],[-sn,0,c]],M));M=q2m(m2q(M))});
+cv.addEventListener('pointerup',()=>drag=null);cv.addEventListener('pointercancel',()=>drag=null);
+function segDist(a,b,c,d){const cr=(p,q,r)=>(q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0]);
+if(cr(a,b,c)*cr(a,b,d)<0&&cr(c,d,a)*cr(c,d,b)<0)return 0;
+const pd=(p,u,v)=>{const dx=v[0]-u[0],dy=v[1]-u[1];let t=((p[0]-u[0])*dx+(p[1]-u[1])*dy)/(dx*dx+dy*dy);t=Math.max(0,Math.min(1,t));return Math.hypot(p[0]-u[0]-t*dx,p[1]-u[1]-t*dy)};
+return Math.min(pd(a,c,d),pd(b,c,d),pd(c,a,b),pd(d,a,b))}
+let lastInfo='';
+function frame(now){
+if(anim){let t=Math.min(1,(now-anim.t0)/anim.d);const e=t*t*(3-2*t);M=q2m(slerp(anim.a,anim.b,e));if(t>=1)anim=null}
+const dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;
+if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr)}
+ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+const cs=getComputedStyle(document.documentElement),g=n=>cs.getPropertyValue(n).trim();
+const tc=g('--ink'),tm=g('--muted'),COL=[g('--x'),g('--y')],GRAY=g('--gray'),AMB=g('--amb');
+const ff=getComputedStyle(document.body).fontFamily;
+const k=Math.min(w,h)/4.4,cx=w/2,cy=h/2,fs=w>600?13:11;
+const pr=p=>[cx+k*dot(M[0],p),cy-k*dot(M[1],p),dot(M[2],p)];
+const S={};for(const v in P)S[v]=pr(P[v]);
+const act=PAIRS[pair],cvx=VK[vtx];
+const role=i=>mode==='pair'?act.indexOf(i):(E[i].includes(cvx)?0:1);
+if(mode==='vertex'){const fc=VK.filter(x=>x!==cvx).map(x=>S[x]);ctx.fillStyle=COL[1];ctx.globalAlpha=0.1;ctx.beginPath();ctx.moveTo(fc[0][0],fc[0][1]);fc.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));ctx.closePath();ctx.fill();ctx.globalAlpha=1}
+const items=E.map((e,i)=>({i,a:S[e[0]],b:S[e[1]],z:(S[e[0]][2]+S[e[1]][2])/2})).sort((p,q)=>p.z-q.z);
+ctx.lineCap='round';
+for(const it of items){const ai=role(it.i);
+ctx.globalCompositeOperation='destination-out';ctx.lineWidth=13;ctx.beginPath();ctx.moveTo(it.a[0],it.a[1]);ctx.lineTo(it.b[0],it.b[1]);ctx.stroke();
+ctx.globalCompositeOperation='source-over';ctx.strokeStyle=ai>=0?COL[ai]:GRAY;ctx.lineWidth=ai>=0?(mode==='pair'?4.5:3.5):2;ctx.globalAlpha=0.55+0.45*(it.z+1.8)/3.6;
+ctx.beginPath();ctx.moveTo(it.a[0],it.a[1]);ctx.lineTo(it.b[0],it.b[1]);ctx.stroke();ctx.globalAlpha=1}
+const mid=i=>{const e=E[i];return P[e[0]].map((x,j)=>(x+P[e[1]][j])/2)};
+if(mode==='pair'){const m1=pr(mid(act[0])),m2=pr(mid(act[1]));
+ctx.setLineDash([5,5]);ctx.strokeStyle=AMB;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(m1[0],m1[1]);ctx.lineTo(m2[0],m2[1]);ctx.stroke();ctx.setLineDash([]);
+ctx.fillStyle=AMB;[m1,m2].forEach(m=>{ctx.beginPath();ctx.arc(m[0],m[1],4,0,7);ctx.fill()})}
+ctx.font=fs+'px '+ff;ctx.textAlign='center';ctx.textBaseline='middle';
+E.forEach((e,i)=>{const ai=role(i);const a=S[e[0]],b=S[e[1]];
+const spoke=mode==='vertex'&&ai===0,diag=mode==='pair'&&ai>=0;const f=diag?0.74:0.5;
+let x=a[0]+(b[0]-a[0])*f,y=a[1]+(b[1]-a[1])*f;
+if(diag||spoke){const nx=-(b[1]-a[1]),ny=b[0]-a[0],nl=Math.hypot(nx,ny)||1;x+=nx/nl*13;y+=ny/nl*13}
+else{const dx=x-cx,dy=y-cy,l=Math.hypot(dx,dy)||1;x+=dx/l*14;y+=dy/l*14}
+ctx.fillStyle=ai>=0?COL[ai]:tm;ctx.fillText(e[2],x,y)});
+ctx.font='500 '+(fs+2)+'px '+ff;
+for(const v in S){const p=S[v];ctx.fillStyle=tc;ctx.beginPath();ctx.arc(p[0],p[1],(mode==='vertex'&&v===cvx)?7.5:5.5,0,7);ctx.fill();
+const dx=p[0]-cx,dy=p[1]-cy,l=Math.hypot(dx,dy);let lx,ly;
+if(l<8){lx=p[0];ly=p[1]+22}else{lx=p[0]+dx/l*26;ly=p[1]+dy/l*18}
+lx=Math.max(46,Math.min(w-46,lx));ly=Math.max(12,Math.min(h-12,ly));ctx.fillText(N[v],lx,ly)}
+let html;
+if(mode==='pair'){const [ea,eb]=act.map(i=>E[i]);const za=(S[ea[0]][2]+S[ea[1]][2])/2,zb=(S[eb[0]][2]+S[eb[1]][2])/2;
+const gap=segDist(S[ea[0]],S[ea[1]],S[eb[0]],S[eb[1]])/k;const front=za>zb?ea[2]:eb[2];
+html=`<div><span class="sw" style="background:var(--x)"></span>X: ${ea[2]} (${N[ea[0]]}–${N[ea[1]]})</div><div><span class="sw" style="background:var(--y)"></span>Y: ${eb[2]} (${N[eb[0]]}–${N[eb[1]]})</div><div><span class="sw" style="background:var(--amb)"></span>Common perpendicular: true gap 2.00; along your line of sight ${Math.abs(za-zb).toFixed(2)}</div><div>${gap<0.005?'Edges appear to cross':'Apparent gap on screen '+gap.toFixed(2)}; nearer to you: ${front}</div>`}
+else{const sp=E.filter(e=>e.includes(cvx)).map(e=>e[2]).join(', '),fa=E.filter(e=>!e.includes(cvx)).map(e=>e[2]).join(', ');
+const others=VK.filter(x=>x!==cvx),fz=others.reduce((a,x)=>a+S[x][2],0)/3,d=S[cvx][2]-fz;
+html=`<div><span class="sw" style="background:var(--x)"></span>Spokes, with ${N[cvx]}: ${sp}</div><div><span class="sw" style="background:var(--y)"></span>Face behind, without ${N[cvx]}: ${fa}</div><div>${N[cvx]} sits ${Math.abs(d).toFixed(2)} ${d>=0?'in front of':'behind'} the face along your line of sight (full height 2.31)</div>`}
+if(html!==lastInfo){info.innerHTML=html;lastInfo=html}
+requestAnimationFrame(frame)}
+go(0);requestAnimationFrame(frame);
+</script>
+</body>
+</html>
